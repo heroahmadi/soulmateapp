@@ -2,12 +2,10 @@ package main
 
 import (
 	"net/http"
-	"soulmateapp/src/api/handler"
-	"soulmateapp/src/api/middleware"
+	"soulmateapp/src/api/routes"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/gorilla/mux"
 )
 
 var APPLICATION_NAME = "My Simple JWT App"
@@ -16,11 +14,7 @@ var JWT_SIGNING_METHOD = jwt.SigningMethodHS256
 var JWT_KEY = []byte("my-secret-key")
 
 func main() {
-	router := mux.NewRouter()
-
-	router.Use(middleware.Authorize)
-
-	router.HandleFunc("/login", handler.LoginHandler)
+	router := routes.Routes()
 
 	http.ListenAndServe(":8080", router)
 }

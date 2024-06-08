@@ -66,7 +66,7 @@ func createToken(user model.User) (string, bool) {
 	claims := model.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "soulmateapp-retail",
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(60))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(1))),
 		},
 		Username: user.Name,
 	}

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"soulmateapp/src/api/handler"
+	"soulmateapp/src/api/middleware"
 
 	"github.com/gorilla/mux"
 )
@@ -9,7 +10,10 @@ import (
 func Routes() *mux.Router {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/", handler.LoginHandler).Methods("GET")
+	router.Use(middleware.Authorize)
+
+	router.HandleFunc("/home", handler.GetAvailableProfiles).Methods("GET")
+	router.HandleFunc("/login", handler.LoginHandler).Methods("POST")
 
 	return router
 }
