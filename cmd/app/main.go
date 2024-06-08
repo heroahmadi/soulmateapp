@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"soulmateapp/api/routes"
+	"soulmateapp/internal/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -14,6 +15,9 @@ var JWT_SIGNING_METHOD = jwt.SigningMethodHS256
 var JWT_KEY = []byte("my-secret-key")
 
 func main() {
+	config.InitMongoClient()
+	defer config.CloseMongoClient()
+
 	router := routes.Routes()
 
 	http.ListenAndServe(":8080", router)
