@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"math/rand"
 	"net/http"
-	"soulmateapp/src/api/model"
+	"soulmateapp/api/model"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"

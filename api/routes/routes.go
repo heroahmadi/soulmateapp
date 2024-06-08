@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"soulmateapp/src/api/handler"
-	"soulmateapp/src/api/middleware"
+	"soulmateapp/api/handler"
+	"soulmateapp/api/middleware"
 
 	"github.com/gorilla/mux"
 )

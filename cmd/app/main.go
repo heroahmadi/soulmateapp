@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"soulmateapp/src/api/routes"
+	"soulmateapp/api/routes"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
