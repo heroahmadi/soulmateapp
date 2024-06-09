@@ -16,6 +16,7 @@ func Routes() *mux.Router {
 	router.HandleFunc("/login", handler.LoginHandler).Methods("POST")
 
 	router.HandleFunc("/home", handler.GetAvailableProfiles).Methods("GET")
+	router.HandleFunc("/swipe", handler.HandleSwipe).Methods("POST")
 
 	return router
 }

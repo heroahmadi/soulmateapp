@@ -19,7 +19,7 @@ func Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		basicAuthUrls := []string{"/login"}
-		bererAuthUrls := []string{"/home"}
+		bererAuthUrls := []string{"/home", "/swipe"}
 
 		if slices.Contains(basicAuthUrls, r.URL.Path) {
 			// TODO
