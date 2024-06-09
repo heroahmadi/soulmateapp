@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var dbName string = "soulmate"
@@ -75,7 +76,13 @@ func initUserData() {
 			return
 		}
 		user.ID = id.String()
-		_, err := collection.InsertOne(context.Background(), user)
+
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			log.Fatal(err)
+		}
+		user.Password = string(hashedPassword)
+		_, err = collection.InsertOne(context.Background(), user)
 		if err != nil {
 			log.Fatal(err)
 		}
