@@ -3,10 +3,14 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"soulmateapp/api/common"
 	"soulmateapp/api/model"
 	"soulmateapp/internal/config"
+	"soulmateapp/pkg/redis"
+	"strconv"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -32,10 +36,13 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 
 	if req.Action == model.Like {
 		like(w, user, targetUser)
-	} else {
-		skip(w, r)
 	}
 
+	err := saveSwipeHistory(user.ID, targetUser.ID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to save swipe history. %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -58,6 +65,17 @@ func like(w http.ResponseWriter, user model.User, targetUser model.User) {
 
 }
 
-func skip(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+func saveSwipeHistory(userId string, targetUserId string) error {
+	key := "swiped:" + userId
+	field := targetUserId
+	err := redis.SetHash(key, field, strconv.Itoa(int(time.Now().Unix())))
+	if err != nil {
+		return err
+	}
+	err = redis.SetExpiryTime(key, 24*time.Hour)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
