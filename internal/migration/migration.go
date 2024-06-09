@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"soulmateapp/api/model"
+	"soulmateapp/api/model/entity"
 	"soulmateapp/internal/config"
 
 	"github.com/google/uuid"
@@ -17,7 +17,8 @@ import (
 )
 
 var dbName string = "soulmate"
-var collectionName string = "users"
+var usersCollectionName string = "users"
+var userLikesCollectionName string = "user_likes"
 
 func InitData() {
 	if err := config.Client.Ping(context.Background(), nil); err != nil {
@@ -28,13 +29,15 @@ func InitData() {
 
 	createUserIndex()
 	initUserData()
+	createUserLikesIndex()
+	initUserLikesData()
 
 	log.Println("Migration completed")
 }
 
 func createUserIndex() {
 	log.Println("Creating index")
-	collection := config.Client.Database(dbName).Collection(collectionName)
+	collection := config.Client.Database(dbName).Collection(usersCollectionName)
 	indexModel := []mongo.IndexModel{
 		{
 			Keys:    bson.D{{Key: "email", Value: 1}},
@@ -56,7 +59,7 @@ func createUserIndex() {
 
 func initUserData() {
 	log.Println("Init user data")
-	collection := config.Client.Database(dbName).Collection(collectionName)
+	collection := config.Client.Database(dbName).Collection(usersCollectionName)
 	truncateCollection(collection)
 
 	data, err := os.ReadFile("db/user.json")
@@ -64,7 +67,7 @@ func initUserData() {
 		log.Fatal(err)
 	}
 
-	var users []model.User
+	var users []entity.User
 	if err := json.Unmarshal(data, &users); err != nil {
 		log.Fatal(err)
 	}
@@ -95,4 +98,25 @@ func truncateCollection(collection *mongo.Collection) {
 		log.Fatal(err)
 	}
 	log.Println("collection trucated")
+}
+
+func createUserLikesIndex() {
+	log.Println("Creating index user likes")
+	collection := config.Client.Database(dbName).Collection(userLikesCollectionName)
+	indexModel := []mongo.IndexModel{
+		{
+			Keys:    bson.D{{Key: "user_id", Value: 1}, {Key: "date", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
+	}
+	_, err := collection.Indexes().CreateMany(context.Background(), indexModel)
+	if err != nil && err.Error() != "index already exists with different options" {
+		log.Fatal(err)
+	}
+}
+
+func initUserLikesData() {
+	log.Println("Init user likes data")
+	collection := config.Client.Database(dbName).Collection(userLikesCollectionName)
+	truncateCollection(collection)
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"soulmateapp/api/common"
 	"soulmateapp/api/model"
+	"soulmateapp/api/model/entity"
 	"soulmateapp/internal/config"
 	"soulmateapp/pkg/redis"
 	"strconv"
@@ -18,7 +19,7 @@ import (
 
 func GetAvailableProfiles(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	user := ctx.Value(common.UserContextKey("user")).(model.User)
+	user := ctx.Value(common.UserContextKey("user")).(entity.User)
 
 	// Parse query parameters from the URL
 	query := r.URL.Query()
@@ -51,18 +52,24 @@ func GetAvailableProfiles(w http.ResponseWriter, r *http.Request) {
 	}
 	defer cursor.Close(context.TODO())
 
-	userMatchCandidates := []model.User{}
+	availableProfiles := []model.GetAvailableProfilesResponse{}
 	for cursor.Next(context.TODO()) {
-		var currentUser model.User
+		var currentUser entity.User
 		err := cursor.Decode(&currentUser)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		userMatchCandidates = append(userMatchCandidates, currentUser)
+		resp := model.GetAvailableProfilesResponse{
+			ID:         currentUser.ID,
+			Username:   currentUser.Username,
+			Name:       currentUser.Name,
+			IsVerified: currentUser.IsPremium,
+		}
+		availableProfiles = append(availableProfiles, resp)
 	}
 
-	output, err := json.Marshal(userMatchCandidates)
+	output, err := json.Marshal(availableProfiles)
 	if err != nil {
 		http.Error(w, "error marshal", http.StatusBadRequest)
 		return
@@ -79,8 +86,8 @@ func getTodaysSwipedUsers(userId string) ([]string, error) {
 		return nil, err
 	}
 
-	currentDateMillis := getDateMillisFromDateTime(time.Now())
-	tomorrowDateMillis := getDateMillisFromDateTime(time.Now().AddDate(0, 0, 1))
+	currentDateMillis := getDateMillisFromDateTime(time.Now().UTC())
+	tomorrowDateMillis := getDateMillisFromDateTime(time.Now().UTC().AddDate(0, 0, 1))
 	swipedUsers := []string{}
 	for key, value := range val {
 		swipedTimestamp, _ := strconv.Atoi(value)
@@ -93,7 +100,7 @@ func getTodaysSwipedUsers(userId string) ([]string, error) {
 }
 
 func getDateMillisFromDateTime(dateTime time.Time) int64 {
-	year, month, day := dateTime.UTC().Date()
+	year, month, day := dateTime.Date()
 	midnight := time.Date(year, month, day, 0, 0, 0, 0, dateTime.Location())
 	return midnight.Unix()
 }

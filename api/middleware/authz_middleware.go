@@ -8,6 +8,7 @@ import (
 	"slices"
 	"soulmateapp/api/common"
 	"soulmateapp/api/model"
+	"soulmateapp/api/model/entity"
 	"soulmateapp/internal/config"
 	"strings"
 
@@ -19,7 +20,7 @@ func Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		basicAuthUrls := []string{"/login"}
-		bererAuthUrls := []string{"/home", "/swipe"}
+		bererAuthUrls := []string{"/profiles", "/swipe"}
 
 		if slices.Contains(basicAuthUrls, r.URL.Path) {
 			// TODO
@@ -45,7 +46,7 @@ func Authorize(next http.Handler) http.Handler {
 			claims := token.Claims.(*model.Claims)
 			username := claims.Username
 			collection := config.Client.Database("soulmate").Collection("users")
-			var user model.User
+			var user entity.User
 			errFind := collection.FindOne(context.Background(), bson.M{"username": username}).Decode(&user)
 			if errFind != nil {
 				http.Error(w, "no account matching from the token", http.StatusBadRequest)

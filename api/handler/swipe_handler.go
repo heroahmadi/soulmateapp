@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"soulmateapp/api/common"
 	"soulmateapp/api/model"
+	"soulmateapp/api/model/entity"
 	"soulmateapp/internal/config"
 	"soulmateapp/pkg/redis"
 	"strconv"
@@ -26,7 +27,7 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	user := ctx.Value(common.UserContextKey("user")).(model.User)
+	user := ctx.Value(common.UserContextKey("user")).(entity.User)
 
 	if !user.IsPremium {
 		count, errCount := countLikes(user)
@@ -34,14 +35,14 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "failed to count transaction", http.StatusBadRequest)
 			return
 		}
-		if count >= 1 {
+		if count >= 10 {
 			http.Error(w, "swipe limit exceed for free user", http.StatusForbidden)
 			return
 		}
 	}
 
 	collection := config.Client.Database("soulmate").Collection("users")
-	var targetUser model.User
+	var targetUser entity.User
 	errFind := collection.FindOne(context.Background(), bson.M{"id": req.AccountId}).Decode(&targetUser)
 	if errFind != nil {
 		http.Error(w, "no account matching the request AccountId", http.StatusBadRequest)
@@ -60,10 +61,10 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func countLikes(user model.User) (int, error) {
-	collection := config.Client.Database("soulmate").Collection("like_transaction")
+func countLikes(user entity.User) (int, error) {
+	collection := config.Client.Database("soulmate").Collection("user_likes")
 	filter := bson.M{"user_id": user.ID, "date": time.Now().UTC().Format("2006-01-02")}
-	likeTransaction := model.LikeTransaction{}
+	likeTransaction := entity.UserLikes{}
 	err := collection.FindOne(context.Background(), filter).Decode(&likeTransaction)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -77,7 +78,7 @@ func countLikes(user model.User) (int, error) {
 	return len(likeTransaction.LikedUsers), nil
 }
 
-func like(w http.ResponseWriter, user model.User, targetUser model.User) {
+func like(w http.ResponseWriter, user entity.User, targetUser entity.User) {
 	filter := bson.M{"user_id": user.ID, "date": time.Now().UTC().Format("2006-01-02")}
 	update := bson.M{
 		"$addToSet": bson.M{
@@ -87,7 +88,7 @@ func like(w http.ResponseWriter, user model.User, targetUser model.User) {
 
 	upsert := true
 	opts := options.Update().SetUpsert(upsert)
-	collection := config.Client.Database("soulmate").Collection("like_transaction")
+	collection := config.Client.Database("soulmate").Collection("user_likes")
 	_, err := collection.UpdateOne(context.Background(), filter, update, opts)
 	if err != nil {
 		http.Error(w, "failed to record like", http.StatusInternalServerError)
@@ -99,7 +100,7 @@ func like(w http.ResponseWriter, user model.User, targetUser model.User) {
 func saveSwipeHistory(userId string, targetUserId string) error {
 	key := getSwipeHistoryKey(userId)
 	field := targetUserId
-	err := redis.SetHash(key, field, strconv.Itoa(int(time.Now().Unix())))
+	err := redis.SetHash(key, field, strconv.Itoa(int(time.Now().UTC().Unix())))
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"soulmateapp/api/model"
+	"soulmateapp/api/model/entity"
 	"soulmateapp/internal/config"
 	"time"
 
@@ -53,9 +54,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 }
 
-func authenticate(username, password string) (*model.User, error) {
+func authenticate(username, password string) (*entity.User, error) {
 	collection := config.Client.Database("soulmate").Collection("users")
-	var user model.User
+	var user entity.User
 	err := collection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&user)
 	if err != nil {
 		return nil, err
@@ -69,13 +70,13 @@ func authenticate(username, password string) (*model.User, error) {
 	return &user, nil
 }
 
-func createToken(user model.User) (string, bool) {
+func createToken(user entity.User) (string, bool) {
 	claims := model.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "soulmateapp-retail",
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(1))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(time.Hour * time.Duration(1))),
 		},
-		Username: user.Name,
+		Username: user.Username,
 	}
 
 	token := jwt.NewWithClaims(
