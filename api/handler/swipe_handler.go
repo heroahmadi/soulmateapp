@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"soulmateapp/api/common"
 	"soulmateapp/api/model"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -23,6 +25,21 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := r.Context()
+	user := ctx.Value(common.UserContextKey("user")).(model.User)
+
+	if !user.IsPremium {
+		count, errCount := countLikes(user)
+		if errCount != nil {
+			http.Error(w, "failed to count transaction", http.StatusBadRequest)
+			return
+		}
+		if count >= 1 {
+			http.Error(w, "swipe limit exceed for free user", http.StatusForbidden)
+			return
+		}
+	}
+
 	collection := config.Client.Database("soulmate").Collection("users")
 	var targetUser model.User
 	errFind := collection.FindOne(context.Background(), bson.M{"id": req.AccountId}).Decode(&targetUser)
@@ -30,9 +47,6 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "no account matching the request AccountId", http.StatusBadRequest)
 		return
 	}
-
-	ctx := r.Context()
-	user := ctx.Value(common.UserContextKey("user")).(model.User)
 
 	if req.Action == model.Like {
 		like(w, user, targetUser)
@@ -46,8 +60,25 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func countLikes(user model.User) (int, error) {
+	collection := config.Client.Database("soulmate").Collection("like_transaction")
+	filter := bson.M{"user_id": user.ID, "date": time.Now().UTC().Format("2006-01-02")}
+	likeTransaction := model.LikeTransaction{}
+	err := collection.FindOne(context.Background(), filter).Decode(&likeTransaction)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	log.Println("Decoded LikeTransaction:", likeTransaction)
+
+	return len(likeTransaction.LikedUsers), nil
+}
+
 func like(w http.ResponseWriter, user model.User, targetUser model.User) {
-	filter := bson.M{"user_id": user.ID}
+	filter := bson.M{"user_id": user.ID, "date": time.Now().UTC().Format("2006-01-02")}
 	update := bson.M{
 		"$addToSet": bson.M{
 			"liked_users": targetUser.ID,
