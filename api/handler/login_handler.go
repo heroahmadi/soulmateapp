@@ -2,12 +2,13 @@ package handler
 
 import (
 	"encoding/json"
-	"math/rand"
+	"log"
 	"net/http"
 	"soulmateapp/api/model"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
 type LoginRequest struct {
@@ -51,8 +52,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 func authenticate(username, password string) (*model.User, bool) {
 	// dummy auth
 	if username == "admin" && password == "admin" {
+		id, errUuid := uuid.NewRandom()
+		if errUuid != nil {
+			log.Println("Error generating UUID:", errUuid)
+		}
+
 		user := model.User{
-			ID:    uint(rand.Uint32()),
+			ID:    id.String(),
 			Email: "admin@uye.com",
 			Name:  "MyUye",
 		}

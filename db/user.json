@@ -1,0 +1,31 @@
+[{
+    "email": "mytest1@test.com",
+    "password": "test",
+    "username": "Test1",
+    "name": "Test 1"
+},{
+    "email": "mytest2@test.com",
+    "password": "test",
+    "username": "Test2",
+    "name": "Test 2"
+},{
+    "email": "mytest3@test.com",
+    "password": "test",
+    "username": "Test3",
+    "name": "Test 3"
+},{
+    "email": "mytest4@test.com",
+    "password": "test",
+    "username": "Test4",
+    "name": "Test 4"
+},{
+    "email": "mytest5@test.com",
+    "password": "test",
+    "username": "Test5",
+    "name": "Test 5"
+},{
+    "email": "mytest6@test.com",
+    "password": "test",
+    "username": "Test6",
+    "name": "Test 6"
+}]
