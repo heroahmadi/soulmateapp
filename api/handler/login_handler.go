@@ -1,30 +1,34 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"soulmateapp/api/model"
+	"soulmateapp/internal/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"golang.org/x/crypto/bcrypt"
 )
-
-type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	username, password, ok := r.BasicAuth()
-	if !ok {
+	if !ok || username == "" || password == "" {
 		http.Error(w, "Invalid username or password basic auth", http.StatusBadRequest)
 		return
 	}
 
-	user, ok := authenticate(username, password)
-	if !ok {
+	var req model.LoginRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	user, err := authenticate(req.Username, req.Password)
+	if err != nil {
 		http.Error(w, "Invalid username or password login", http.StatusBadRequest)
 		return
 	}
@@ -49,23 +53,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 }
 
-func authenticate(username, password string) (*model.User, bool) {
-	// dummy auth
-	if username == "admin" && password == "admin" {
-		id, errUuid := uuid.NewRandom()
-		if errUuid != nil {
-			log.Println("Error generating UUID:", errUuid)
-		}
-
-		user := model.User{
-			ID:    id.String(),
-			Email: "mytest1@test.com",
-			Name:  "Test1",
-		}
-		return &user, true
+func authenticate(username, password string) (*model.User, error) {
+	collection := config.Client.Database("soulmate").Collection("users")
+	var user model.User
+	err := collection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, false
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func createToken(user model.User) (string, bool) {
