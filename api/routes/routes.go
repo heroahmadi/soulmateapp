@@ -12,7 +12,10 @@ func Routes() *mux.Router {
 
 	router.Use(middleware.Authorize)
 
-	router.HandleFunc("/register", handler.Register).Methods("POST")
+	router.HandleFunc("/user", handler.Register).Methods("POST")
+	router.HandleFunc("/user/{id}", handler.GetUser).Methods("GET")
+	router.HandleFunc("/user/{id}", handler.UpdateUser).Methods("PUT")
+
 	router.HandleFunc("/login", handler.LoginHandler).Methods("POST")
 
 	router.HandleFunc("/profiles", handler.GetAvailableProfiles).Methods("GET")
