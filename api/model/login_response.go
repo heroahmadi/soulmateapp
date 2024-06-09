@@ -1,5 +1,5 @@
 package model
 
 type LoginResponse struct {
-	Token string
+	Token string `json:"token"`
 }
