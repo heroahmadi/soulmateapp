@@ -8,7 +8,9 @@ import (
 	"soulmateapp/api/common"
 	"soulmateapp/api/model"
 	"soulmateapp/internal/config"
+	"soulmateapp/pkg/redis"
 	"strconv"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -31,15 +33,26 @@ func GetAvailableProfiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	collection := config.Client.Database("soulmate").Collection("users")
-	cursor, errFind := collection.Find(context.Background(), bson.M{"username": bson.M{"$ne": user.Username}}, options.Find().SetLimit(int64(limit)).SetSkip(int64(limit*page)))
-	if errFind != nil {
-		http.Error(w, "no account matching from the token", http.StatusBadRequest)
+	todaysSwipedUsers, err := getTodaysSwipedUsers(user.ID)
+	if err != nil {
+		http.Error(w, "failed to get swiped users", http.StatusInternalServerError)
 		return
 	}
 
-	var userMatchCandidates []model.User
-	for cursor.Next(context.Background()) {
+	filters := bson.M{
+		"username": bson.M{"$ne": user.Username},
+		"id":       bson.M{"$nin": todaysSwipedUsers},
+	}
+	collection := config.Client.Database("soulmate").Collection("users")
+	cursor, errFind := collection.Find(context.Background(), filters, options.Find().SetLimit(int64(limit)).SetSkip(int64(limit*(page-1))))
+	if errFind != nil {
+		http.Error(w, "no account matching", http.StatusBadRequest)
+		return
+	}
+	defer cursor.Close(context.TODO())
+
+	userMatchCandidates := []model.User{}
+	for cursor.Next(context.TODO()) {
 		var currentUser model.User
 		err := cursor.Decode(&currentUser)
 		if err != nil {
@@ -57,4 +70,30 @@ func GetAvailableProfiles(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(output)
+}
+
+func getTodaysSwipedUsers(userId string) ([]string, error) {
+	redisKey := getSwipeHistoryKey(userId)
+	val, err := redis.GetAllHash(redisKey)
+	if err != nil {
+		return nil, err
+	}
+
+	currentDateMillis := getDateMillisFromDateTime(time.Now())
+	tomorrowDateMillis := getDateMillisFromDateTime(time.Now().AddDate(0, 0, 1))
+	swipedUsers := []string{}
+	for key, value := range val {
+		swipedTimestamp, _ := strconv.Atoi(value)
+		if int64(swipedTimestamp) >= currentDateMillis && int64(swipedTimestamp) < tomorrowDateMillis {
+			swipedUsers = append(swipedUsers, key)
+		}
+	}
+
+	return swipedUsers, nil
+}
+
+func getDateMillisFromDateTime(dateTime time.Time) int64 {
+	year, month, day := dateTime.UTC().Date()
+	midnight := time.Date(year, month, day, 0, 0, 0, 0, dateTime.Location())
+	return midnight.Unix()
 }

@@ -66,7 +66,7 @@ func like(w http.ResponseWriter, user model.User, targetUser model.User) {
 }
 
 func saveSwipeHistory(userId string, targetUserId string) error {
-	key := "swiped:" + userId
+	key := getSwipeHistoryKey(userId)
 	field := targetUserId
 	err := redis.SetHash(key, field, strconv.Itoa(int(time.Now().Unix())))
 	if err != nil {
@@ -78,4 +78,8 @@ func saveSwipeHistory(userId string, targetUserId string) error {
 	}
 
 	return nil
+}
+
+func getSwipeHistoryKey(userId string) string {
+	return "swiped:" + userId
 }

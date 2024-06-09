@@ -7,20 +7,6 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-func Set(key string, value string) error {
-	rdb := config.GetRedisClient()
-	ctx := config.GetContext()
-	err := rdb.Set(ctx, key, value, 0).Err()
-
-	return err
-}
-
-func Get(key string) (string, error) {
-	rdb := config.GetRedisClient()
-	ctx := config.GetContext()
-	return rdb.Get(ctx, key).Result()
-}
-
 func SetHash(key string, field string, value string) error {
 	rdb := config.GetRedisClient()
 	ctx := config.GetContext()
@@ -35,6 +21,12 @@ func GetHash(key string, field string) (string, error) {
 		return "", nil
 	}
 	return val, err
+}
+
+func GetAllHash(key string) (map[string]string, error) {
+	rdb := config.GetRedisClient()
+	ctx := config.GetContext()
+	return rdb.HGetAll(ctx, key).Result()
 }
 
 func SetExpiryTime(key string, expiryTime time.Duration) error {

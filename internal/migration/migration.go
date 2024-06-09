@@ -43,6 +43,9 @@ func createUserIndex() {
 			Keys:    bson.D{{Key: "username", Value: 1}},
 			Options: options.Index().SetUnique(true),
 		},
+		{
+			Keys: bson.D{{Key: "username", Value: 1}, {Key: "id", Value: 1}},
+		},
 	}
 	_, err := collection.Indexes().CreateMany(context.Background(), indexModel)
 	if err != nil && err.Error() != "index already exists with different options" {
