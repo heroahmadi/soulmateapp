@@ -80,7 +80,7 @@ func initUserData() {
 }
 
 func truncateCollection(collection *mongo.Collection) {
-	_, err := collection.DeleteMany(context.TODO(), bson.M{})
+	_, err := collection.DeleteMany(context.Background(), bson.M{})
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -59,8 +59,8 @@ func authenticate(username, password string) (*model.User, bool) {
 
 		user := model.User{
 			ID:    id.String(),
-			Email: "admin@uye.com",
-			Name:  "MyUye",
+			Email: "mytest1@test.com",
+			Name:  "Test1",
 		}
 		return &user, true
 	}
