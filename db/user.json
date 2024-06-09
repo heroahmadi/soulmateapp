@@ -1,37 +1,107 @@
-[{
-    "email": "mytest1@test.com",
-    "password": "test",
-    "username": "Test1",
-    "name": "Test 1",
-    "is_premium": false
-},{
-    "email": "mytest2@test.com",
-    "password": "test",
-    "username": "Test2",
-    "name": "Test 2",
-    "is_premium": false
-},{
-    "email": "mytest3@test.com",
-    "password": "test",
-    "username": "Test3",
-    "name": "Test 3",
-    "is_premium": false
-},{
-    "email": "mytest4@test.com",
-    "password": "test",
-    "username": "Test4",
-    "name": "Test 4",
-    "is_premium": false
-},{
-    "email": "mytest5@test.com",
-    "password": "test",
-    "username": "Test5",
-    "name": "Test 5",
-    "is_premium": false
-},{
-    "email": "mytest6@test.com",
-    "password": "test",
-    "username": "Test6",
-    "name": "Test 6",
-    "is_premium": false
-}]
+[
+    {
+        "email": "mytest1@test.com",
+        "password": "test",
+        "username": "Test1",
+        "name": "Test 1",
+        "is_premium": false
+    },
+    {
+        "email": "mytest2@test.com",
+        "password": "test",
+        "username": "Test2",
+        "name": "Test 2",
+        "is_premium": false
+    },
+    {
+        "email": "mytest3@test.com",
+        "password": "test",
+        "username": "Test3",
+        "name": "Test 3",
+        "is_premium": false
+    },
+    {
+        "email": "mytest4@test.com",
+        "password": "test",
+        "username": "Test4",
+        "name": "Test 4",
+        "is_premium": false
+    },
+    {
+        "email": "mytest5@test.com",
+        "password": "test",
+        "username": "Test5",
+        "name": "Test 5",
+        "is_premium": false
+    },
+    {
+        "email": "mytest6@test.com",
+        "password": "test",
+        "username": "Test6",
+        "name": "Test 6",
+        "is_premium": false
+    },
+    {
+        "email": "mytest7@test.com",
+        "password": "test",
+        "username": "Test7",
+        "name": "Test 7",
+        "is_premium": false
+    },
+    {
+        "email": "mytest8@test.com",
+        "password": "test",
+        "username": "Test8",
+        "name": "Test 8",
+        "is_premium": false
+    },
+    {
+        "email": "mytest9@test.com",
+        "password": "test",
+        "username": "Test9",
+        "name": "Test 9",
+        "is_premium": false
+    },
+    {
+        "email": "mytest10@test.com",
+        "password": "test",
+        "username": "Test10",
+        "name": "Test 10",
+        "is_premium": false
+    },
+    {
+        "email": "mytest11@test.com",
+        "password": "test",
+        "username": "Test11",
+        "name": "Test 11",
+        "is_premium": false
+    },
+    {
+        "email": "mytest12@test.com",
+        "password": "test",
+        "username": "Test12",
+        "name": "Test 12",
+        "is_premium": false
+    },
+    {
+        "email": "mytest13@test.com",
+        "password": "test",
+        "username": "Test13",
+        "name": "Test 13",
+        "is_premium": false
+    },
+    {
+        "email": "mytest14@test.com",
+        "password": "test",
+        "username": "Test14",
+        "name": "Test 14",
+        "is_premium": false
+    },
+    {
+        "email": "mytest15@test.com",
+        "password": "test",
+        "username": "Test15",
+        "name": "Test 15",
+        "is_premium": false
+    }
+]

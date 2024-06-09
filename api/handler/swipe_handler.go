@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"soulmateapp/api/common"
 	"soulmateapp/api/model"
@@ -15,7 +14,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -30,7 +28,7 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 	user := ctx.Value(common.UserContextKey("user")).(entity.User)
 
 	if !user.IsPremium {
-		count, errCount := countLikes(user)
+		count, errCount := countSwipes(user)
 		if errCount != nil {
 			http.Error(w, "failed to count transaction", http.StatusBadRequest)
 			return
@@ -61,21 +59,14 @@ func HandleSwipe(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func countLikes(user entity.User) (int, error) {
-	collection := config.Client.Database("soulmate").Collection("user_likes")
-	filter := bson.M{"user_id": user.ID, "date": time.Now().UTC().Format("2006-01-02")}
-	likeTransaction := entity.UserLikes{}
-	err := collection.FindOne(context.Background(), filter).Decode(&likeTransaction)
+func countSwipes(user entity.User) (int, error) {
+	key := getSwipeHistoryKey(user.ID)
+	val, err := redis.GetAllHash(key)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return 0, nil
-		}
 		return 0, err
 	}
 
-	log.Println("Decoded LikeTransaction:", likeTransaction)
-
-	return len(likeTransaction.LikedUsers), nil
+	return len(val), nil
 }
 
 func like(w http.ResponseWriter, user entity.User, targetUser entity.User) {
