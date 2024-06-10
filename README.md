@@ -3,7 +3,7 @@
 
   
 
-A brief description of your project.
+Tinder Bumble like app
 
   
 
