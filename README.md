@@ -17,7 +17,7 @@ Tinder Bumble like app
 
 - [Running the dependency services](#running-the-dependency-services)
 
-- [Running app](#running-app)
+- [Running the app](#running-the-app)
 
 - [Running the Tests](#running-the-tests)
 
@@ -41,11 +41,17 @@ Go to the `deployment/local` folder, and run docker compose
 
 This will create 2 new container (MongoDB & Redis) and 1 docker volume to store database data.
 
-### Running app
+### Running the app
 
-Go to the project root, and run go run
+This project includes executable file. To run it, do:
+
+    ./main
+
+Or, if you want to run using go run, then run with:
 
     go run cmd/app/main.go
+
+App will be run on http://localhost:8080
 
 ### Running the tests
 The tests included in this project is a postman test. The exported file is in the root directory named `SoulmateApp.postman_collection`.
