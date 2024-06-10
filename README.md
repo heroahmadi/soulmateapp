@@ -21,8 +21,6 @@ A brief description of your project.
 
 - [Running the Tests](#running-the-tests)
 
-- [Deployment](#deployment)
-
   
 
 ## Getting Started
@@ -48,6 +46,12 @@ This will create 2 new container (MongoDB & Redis) and 1 docker volume to store 
 Go to the project root, and run go run
 
     go run cmd/app/main.go
+
+### Running the tests
+The tests included in this project is a postman test. The exported file is in the root directory named `SoulmateApp.postman_collection`.
+After exporting the collection, use postman runner and check the tests
+
+![Postman Screenshot](https://i.ibb.co.com/7xhRTG4/SCR-20240610-hany.png)
 
 ## Project Structure
 ```go
@@ -92,4 +96,5 @@ project-root/
     ├── go.mod                   # Go module file
     ├── go.sum                   # Go module dependencies file
     └── README.md                # Project README
+    └── SoulmateApp.postman_collection # Postman test collection
 ```
