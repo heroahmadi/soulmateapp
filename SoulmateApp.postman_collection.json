@@ -1,0 +1,1164 @@
+{
+	"info": {
+		"_postman_id": "8a4f73f7-3e14-4fd5-8587-824d42524695",
+		"name": "SoulmateApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "865336"
+	},
+	"item": [
+		{
+			"name": "Register & Login",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"username\", \"test\" + Math.floor(Date.now() / 1000))"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 201\", function() {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"})",
+									"pm.collectionVariables.set(\"accountId\", pm.response.headers.get('Location').split('user/')[1])"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"Abc123\",\n    \"email\": \"{{username}}@test.com\",\n    \"name\": \"my name\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();",
+									"pm.test(\"Response code 200 and token exists\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"    pm.expect(responseData.token).to.not.be.empty;",
+									"})",
+									"pm.collectionVariables.set(\"token\", responseData.token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"Abc123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Swipe 10 times",
+			"item": [
+				{
+					"name": "Get Available Profiles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();",
+									"",
+									"pm.test(\"Response code 200 and response valid\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"    pm.expect(responseData.length).to.equal(11);",
+									"})",
+									"",
+									"pm.collectionVariables.set(\"targetAccountId1\", responseData[0].id);",
+									"pm.collectionVariables.set(\"targetAccountId2\", responseData[1].id);",
+									"pm.collectionVariables.set(\"targetAccountId3\", responseData[2].id);",
+									"pm.collectionVariables.set(\"targetAccountId4\", responseData[3].id);",
+									"pm.collectionVariables.set(\"targetAccountId5\", responseData[4].id);",
+									"pm.collectionVariables.set(\"targetAccountId6\", responseData[5].id);",
+									"pm.collectionVariables.set(\"targetAccountId7\", responseData[6].id);",
+									"pm.collectionVariables.set(\"targetAccountId8\", responseData[7].id);",
+									"pm.collectionVariables.set(\"targetAccountId9\", responseData[8].id);",
+									"pm.collectionVariables.set(\"targetAccountId10\", responseData[9].id);",
+									"pm.collectionVariables.set(\"targetAccountId11\", responseData[10].id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/profiles?limit=11&page=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"profiles"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "11"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"like\",\n    \"accountId\": \"{{targetAccountId1}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"like\",\n    \"accountId\": \"{{targetAccountId2}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"like\",\n    \"accountId\": \"{{targetAccountId3}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like 4",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"like\",\n    \"accountId\": \"{{targetAccountId4}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like 5",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"like\",\n    \"accountId\": \"{{targetAccountId5}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Skip 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"skip\",\n    \"accountId\": \"{{targetAccountId6}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Skip 7",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"skip\",\n    \"accountId\": \"{{targetAccountId7}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Skip 8",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"skip\",\n    \"accountId\": \"{{targetAccountId8}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Skip 9",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"skip\",\n    \"accountId\": \"{{targetAccountId9}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Skip 10",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"skip\",\n    \"accountId\": \"{{targetAccountId10}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Swipe Failed - Exceed Limit",
+			"item": [
+				{
+					"name": "Skip - failed exceed limit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 403\", function() {",
+									"    pm.expect(pm.response.code).to.equal(403);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"skip\",\n    \"accountId\": \"{{targetAccountId11}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update to Premium",
+			"item": [
+				{
+					"name": "Get Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();",
+									"pm.test(\"Response code 200 and response valid\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"    pm.expect(responseData.length).to.not.equal(0);",
+									"})",
+									"pm.collectionVariables.set(\"email\", responseData.email)",
+									"pm.collectionVariables.set(\"username\", responseData.username)",
+									"pm.collectionVariables.set(\"name\", responseData.name)",
+									"pm.collectionVariables.set(\"is_premium\", responseData.is_premium)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/{{accountId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"{{accountId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update account to premium",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 202 and response valid\", function() {",
+									"    pm.expect(pm.response.code).to.equal(202);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var accountInfo = pm.collectionVariables.get(\"accountInfo\")",
+									"accountInfo.is_premium = true",
+									"pm.collectionVariables.set(\"updatedAccountInfo\", accountInfo)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"username\": \"{{username}}\",\n    \"password\": \"Abc123\",\n    \"name\": \"{{name}}\",\n    \"is_premium\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/{{accountId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"{{accountId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account - premium",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();",
+									"pm.test(\"Response code 200 and response valid\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"    pm.expect(responseData.length).to.not.equal(0);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/{{accountId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"{{accountId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Unlimited Swipe",
+			"item": [
+				{
+					"name": "Get Available Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();",
+									"",
+									"pm.test(\"Response code 200 and response valid\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"    pm.expect(responseData.length).to.not.equal(0);",
+									"})",
+									"",
+									"pm.collectionVariables.set(\"targetAccountId1\", responseData[0].id);",
+									"pm.collectionVariables.set(\"targetAccountId2\", responseData[1].id);",
+									"pm.collectionVariables.set(\"targetAccountId3\", responseData[2].id);",
+									"pm.collectionVariables.set(\"targetAccountId4\", responseData[3].id);",
+									"pm.collectionVariables.set(\"targetAccountId5\", responseData[4].id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/profiles?limit=11&page=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"profiles"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "11"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Skip",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code 204\", function() {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"skip\",\n    \"accountId\": \"{{targetAccountId1}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/swipe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "targetAccountId",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "idsArray",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId1",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId2",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId3",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId4",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId5",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId6",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId7",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId8",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId9",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId10",
+			"value": ""
+		},
+		{
+			"key": "targetAccountId11",
+			"value": ""
+		},
+		{
+			"key": "accountInfo",
+			"value": ""
+		},
+		{
+			"key": "updatedAccountInfo",
+			"value": ""
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "name",
+			"value": ""
+		},
+		{
+			"key": "is_premium",
+			"value": ""
+		},
+		{
+			"key": "accountId",
+			"value": ""
+		}
+	]
+}
